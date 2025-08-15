@@ -15,19 +15,10 @@ const state = {
     loop: null
 }
 
-const shuffle = array => {
-    const clonedArray = [...array]
-
-    for (let index = clonedArray.length - 1; index > 0; index--) {
-        const randomIndex = Math.floor(Math.random() * (index + 1))
-        const original = clonedArray[index]
-
-        clonedArray[index] = clonedArray[randomIndex]
-        clonedArray[randomIndex] = original
-    }
-
-    return clonedArray
-}
+const shuffle = array => 
+    array.map(value => ({ value, sort: Math.random() })) // adiciona chave aleatória
+         .sort((a, b) => a.sort - b.sort)                // ordena pela chave
+         .map(({ value }) => value)  
 
 const pickRandom = (array, items) => {
     const clonedArray = [...array]
