@@ -18,4 +18,13 @@ const applyLogin = state => {
   window.location = 'pagina/page1.html';
 };
 
+const handleInput = event => 
+  applyButtonState(buttonState(isValid(event.target.value)));
 
+const handleSubmit = event => {
+  event.preventDefault();
+  applyLogin(loginState(input.value));
+};
+
+input.addEventListener('input', handleInput);
+form.addEventListener('submit', handleSubmit);
