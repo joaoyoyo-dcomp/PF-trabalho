@@ -17,33 +17,40 @@ const state = {
 
 const nextRandom = seed => {
   const next = (1664525 * seed + 1013904223) >>> 0;
-  return { value: next / 2**32, seed: next };
+  return { value: next / 2 ** 32, seed: next };
 };
 
-const shuffle = (array, seed) => {
-  const { mapped, seed: finalSeed } = array.reduce(
+const shuffle = (array, seed = (Date.now() >>> 0)) => {
+  const { mapped } = array.reduce(
     ({ mapped, seed: s }, value) => {
       const { value: r, seed: newSeed } = nextRandom(s);
+      return { mapped: [...mapped, { value, sort: r }], seed: newSeed };
+    },
+    { mapped: [], seed }
+  );
+  return mapped.sort((a, b) => a.sort - b.sort).map(({ value }) => value);
+};
+
+const pickRandom = (array, items, seed = (Date.now() >>> 0)) => {
+  const n = Math.min(Math.max(items | 0, 0), array.length);
+
+  const { picks } = Array.from({ length: n }).reduce(
+    ({ picks, pool, seed: s }) => {
+      const { value: r, seed: newSeed } = nextRandom(s);
+      const idx = Math.floor(r * pool.length);
+      const chosen = pool[idx];
+      const newPool = pool.filter((_, i) => i !== idx);
+
       return {
-        mapped: [...mapped, { value, sort: r }],
+        picks: [...picks, chosen],
+        pool: newPool,
         seed: newSeed
       };
     },
-    { mapped: [], seed }
-  ); 
+    { picks: [], pool: [...array], seed }
+  );
 
-const pickRandom = (array, items) => {
-    const clonedArray = [...array]
-    const randomPicks = []
-
-    for (let index = 0; index < items; index++) {
-        const randomIndex = Math.floor(Math.random() * clonedArray.length)
-        
-        randomPicks.push(clonedArray[randomIndex])
-        clonedArray.splice(randomIndex, 1)
-    }
-
-    return randomPicks
+  return picks;
 }
 
 const generateGame = () => {
