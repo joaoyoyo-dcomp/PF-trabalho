@@ -20,10 +20,17 @@ const nextRandom = seed => {
   return { value: next / 2**32, seed: next };
 };
 
-const shuffle = array => 
-    array.map(value => ({ value, sort: nextRandom() })) // adiciona chave aleatória
-         .sort((a, b) => a.sort - b.sort)                // ordena pela chave
-         .map(({ value }) => value)  
+const shuffle = (array, seed) => {
+  const { mapped, seed: finalSeed } = array.reduce(
+    ({ mapped, seed: s }, value) => {
+      const { value: r, seed: newSeed } = nextRandom(s);
+      return {
+        mapped: [...mapped, { value, sort: r }],
+        seed: newSeed
+      };
+    },
+    { mapped: [], seed }
+  ); 
 
 const pickRandom = (array, items) => {
     const clonedArray = [...array]
