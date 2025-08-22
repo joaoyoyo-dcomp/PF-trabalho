@@ -1,11 +1,9 @@
-const selectors = {
-    boardContainer: document.querySelector('.board-container'),
-    board: document.querySelector('.board'),
-    moves: document.querySelector('.moves'),
-    timer: document.querySelector('.timer'),
-    start: document.querySelector('button'),
-    win: document.querySelector('.win')
-}
+const getBoardContainer = () => document.querySelector('.board-container')
+const getBoard          = () => document.querySelector('.board')
+const getMoves          = () => document.querySelector('.moves')
+const getTimer          = () => document.querySelector('.timer')
+const getStartButton    = () => document.querySelector('button')
+const getWin            = () => document.querySelector('.win')
 
 const state = {
     gameStarted: false,
@@ -54,7 +52,8 @@ const pickRandom = (array, items, seed = (Date.now() >>> 0)) => {
 }
 
 const generateGame = () => {
-    const dimensions = selectors.board.getAttribute('data-dimension')
+    const dimensions = getBoard().getAttribute('data-dimension')
+
 
     if (dimensions % 2 !== 0) {
         throw new Error("The dimension of the board must be an even number.")
@@ -66,40 +65,45 @@ const generateGame = () => {
     const cards = `
         <div class="board" style="grid-template-columns: repeat(${dimensions}, auto)">
             ${items.map(item => `
-                <div class="card">
-                    <div class="card-front"></div>
-                    <div class="card-back">${item}</div>
-                </div>
+              <div class="card">
+    <input type="checkbox" />
+    <div class="card-front"></div>
+    <div class="card-back">${item}</div>
+</div>
+
             `).join('')}
        </div>
     `
     
     const parser = new DOMParser().parseFromString(cards, 'text/html')
-
-    selectors.board.replaceWith(parser.querySelector('.board'))
+    getBoard().replaceWith(parser.querySelector('.board'))
 }
 
 const startGame = () => {
     state.gameStarted = true
-    selectors.start.classList.add('disabled')
+    getStartButton().classList.add('disabled')
 
     state.loop = setInterval(() => {
         state.totalTime++
 
-        selectors.moves.innerText = `${state.totalFlips} moves`
-        selectors.timer.innerText = `time: ${state.totalTime} sec`
+        getMoves().innerText = `${state.totalFlips} moves`
+        getTimer().innerText = `time: ${state.totalTime} sec`
     }, 1000)
 }
-
 const flipBackCards = () => {
-    document.querySelectorAll('.card:not(.matched)').forEach(card => {
-        card.classList.remove('flipped')
+    document.querySelectorAll('.card:not(.matched) input').forEach(input => {
+        input.checked = false
     })
-
     state.flippedCards = 0
 }
 
 const flipCard = card => {
+     // Se já existem 2 cartas viradas, não vira mais nenhuma
+    if (state.flippedCards >= 2) return 
+    const input = card.querySelector('input')
+    if (input.checked) return // impede virar a mesma carta duas vezes
+    input.checked = true   // agora só o JS controla isso
+
     state.flippedCards++
     state.totalFlips++
 
@@ -107,52 +111,53 @@ const flipCard = card => {
         startGame()
     }
 
-    if (state.flippedCards <= 2) {
-        card.classList.add('flipped')
-    }
-
     if (state.flippedCards === 2) {
-        const flippedCards = document.querySelectorAll('.flipped:not(.matched)')
+        const flippedInputs = document.querySelectorAll('.card:not(.matched) input:checked')
+        const flippedCards = Array.from(flippedInputs).map(input => input.parentElement)
 
-        if (flippedCards[0].innerText === flippedCards[1].innerText) {
-            flippedCards[0].classList.add('matched')
-            flippedCards[1].classList.add('matched')
-        }
+        const value1 = flippedCards[0].querySelector('.card-back').innerText
+        const value2 = flippedCards[1].querySelector('.card-back').innerText
+
+if (value1 === value2) {
+    flippedCards[0].classList.add('matched')
+    flippedCards[1].classList.add('matched')
+}
 
         setTimeout(() => {
             flipBackCards()
         }, 1000)
     }
 
-    // If there are no more cards that we can flip, we won the game
-    if (!document.querySelectorAll('.card:not(.flipped)').length) {
+    // verificar vitória
+    if (!document.querySelectorAll('.card input:not(:checked)').length) {
         setTimeout(() => {
-            selectors.boardContainer.classList.add('flipped')
-            selectors.win.innerHTML = `
+            getBoardContainer().classList.add('flipped')
+            getWin().innerHTML =
+            `
                 <span class="win-text">
-                    You won!<br />
-                    with <span class="highlight">${state.totalFlips}</span> moves<br />
-                    under <span class="highlight">${state.totalTime}</span> seconds
+                    Você ganhou!<br />
+                    com <span class="highlight">${state.totalFlips}</span> movimentos<br />
+                    em <span class="highlight">${state.totalTime}</span> segundos
                 </span>
             `
-
             clearInterval(state.loop)
         }, 1000)
     }
-}
+    }
+
 
 const attachEventListeners = () => {
     document.addEventListener('click', event => {
-        const eventTarget = event.target
-        const eventParent = eventTarget.parentElement
-
-        if (eventTarget.className.includes('card') && !eventParent.className.includes('flipped')) {
-            flipCard(eventParent)
-        } else if (eventTarget.nodeName === 'BUTTON' && !eventTarget.className.includes('disabled')) {
+        const card = event.target.closest('.card')
+        
+        if (card && !card.classList.contains('matched')) {
+            flipCard(card)
+        } else if (event.target.nodeName === 'BUTTON' && !event.target.classList.contains('disabled')) {
             startGame()
         }
     })
 }
+
 
 generateGame()
 attachEventListeners()
