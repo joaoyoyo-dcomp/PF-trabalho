@@ -1,61 +1,203 @@
-
-@font-face {
-    font-family: Fredoka;
-    src: url(./FredokaOne-Regular.ttf);
+:root {
+  /* Define o tamanho da carta por fase */
+  --gap-size: 15px;
 }
 
-html, body {
-  margin: 0;
-  height: 100%;
-  background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-  font-family: Fredoka, sans-serif;
+body {
+  font-family: 'Fredoka One', cursive;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  transition: background 0.5s ease;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
 }
 
-.board {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  gap: 10px; /* espaçamento mais bonito */
+/* --- ESTILOS DA TELA DE LOGIN --- */
+body.login-page {
+  background: linear-gradient(45deg, #2b580c, #000000);
 }
-.card {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  perspective: 1000px;
+
+.login-form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.login__header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
+}
+.login__header img {
+  width: 100px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+}
+.login__header h1 {
+  color: #fff;
+  font-size: 2em;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+}
+
+.login__input {
+  border: 2px solid #a3b18a;
+  background: #3a5a40;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  max-width: 300px;
+  outline: none;
+  padding: 15px;
+  width: 100%;
+  text-align: center;
+}
+.login__input::placeholder {
+  color: #a3b18a;
+}
+
+.login__button {
+  background-color: #588157;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
   cursor: pointer;
+  font-size: 1.2em;
+  font-family: 'Fredoka One', cursive;
+  max-width: 300px;
+  padding: 15px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+.login__button:hover:not(:disabled) {
+  background-color: #3a5a40;
+}
+.login__button:disabled {
+  background-color: #333;
+  color: #777;
+  cursor: auto;
 }
 
-.card-front,
-.card-back {
-  position: absolute;
-  border-radius: 12px;
+
+/* --- ESTILOS DO JOGO --- */
+
+/* Temas de Fundo e Tamanho das Cartas para cada Fase */
+body.fase-1 {
+  background: linear-gradient(45deg, #2b580c, #000000);
+  --card-size: 140px;
+}
+body.fase-2 {
+  background: linear-gradient(45deg, #c2b280, #8a795d);
+  --card-size: 130px;
+}
+body.fase-3 {
+  background: linear-gradient(45deg, #4b6a98, #1e2a3b);
+  --card-size: 120px;
+}
+body.fase-4 {
+  background: linear-gradient(45deg, #8b0000, #2c1a1a);
+  --card-size: 90px; /* Cartas menores para caber na tela */
+}
+body.vitoria-final {
+  background: linear-gradient(45deg, #ffd700, #ff8c00);
+}
+
+#app {
+  text-align: center;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  max-width: 95vw;
+}
+
+h2 {
+  margin-bottom: 25px;
+  color: #fff;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+}
+
+.tabuleiro {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  gap: var(--gap-size);
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+.carta {
+  width: var(--card-size);
+  height: var(--card-size);
+  cursor: pointer;
+  position: relative;
+  background: none;
+  border: none;
+}
+
+.carta-inner {
+  position: relative;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden;
-  transition: transform 0.6s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  border-radius: 15px;
 }
 
-.card-front {
-  background: #282A3A;
+.carta.revelada .carta-inner,
+.carta.combinada .carta-inner {
+  transform: rotateY(180deg);
 }
 
-.card-back {
-  background: #FDF8E6;
-  font-size: 40pt;
+.carta-front,
+.carta-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; /* Mantém essa propriedade */
+  border-radius: 15px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  transform: rotateY(180deg);
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
-/* flip controlado por classe */
-.card.revealed .card-front {
-  transform: rotateY(180deg);
+.carta-front {
+  background: #3a5a40;
+  border: 3px solid #a3b18a;
+  font-size: calc(var(--card-size) * 0.6);
+  color: #a3b18a;
 }
-.card.revealed .card-back {
-  transform: rotateY(0deg);
+
+.carta-back {
+  background: #dad7cd;
+  transform: rotateY(180deg);
+  font-size: calc(var(--card-size) * 0.5);
+}
+
+.carta.combinada {
+  cursor: default;
+  opacity: 0.7;
+  transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 768px) {
+  body.fase-3 { --card-size: 80px; }
+  body.fase-4 { --card-size: 60px; }
+  :root { --gap-size: 10px; }
+  h2 { font-size: 2em; }
 }
