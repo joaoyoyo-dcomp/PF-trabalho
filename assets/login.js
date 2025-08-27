@@ -23,7 +23,7 @@ const buttonAttrs = valid => valid ? {} : { disabled: true }
 // Gera uma string de HTML descrevendo o botão
 // Isso permite separar a "descrição" do botão da manipulação real do DOM
 const buttonView = attrs =>
-  `<button class="login__button" ${attrs.disabled ? "disabled" : ""}>Play</button>`
+  `<button class="login__button" ${attrs.disabled ? "disabled" : ""}>Jogar</button>`
 
 // Responsável por renderizar o botão no DOM
 const renderButton = attrs => {
