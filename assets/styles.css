@@ -1,10 +1,15 @@
+/* =========================================================
+   VARIÁVEIS GLOBAIS
+========================================================= */
 :root {
-  /* Define o tamanho da carta por fase */
-  --gap-size: 15px;
+  --gap-size: 15px; /* espaçamento entre cartas */
 }
 
+/* =========================================================
+   BASE
+========================================================= */
 body {
-  font-family: 'Fredoka One', cursive;
+  font-family: 'Nunito', 'Fredoka One', cursive, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,26 +22,40 @@ body {
   overflow: hidden;
 }
 
-/* --- ESTILOS DA TELA DE LOGIN --- */
+h2 {
+  margin-bottom: 25px;
+  font-size: 2.5em;
+  color: #fff;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+  font-family: 'Fredoka One', cursive;
+}
+
+h2, .login__button {
+  font-family: 'Fredoka One', cursive;
+}
+
+/* =========================================================
+   TELA DE LOGIN
+========================================================= */
 body.login-page {
   background: linear-gradient(45deg, #2b580c, #000000);
 }
 
 .login-form {
-  align-items: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.4);
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .login__header {
-  align-items: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin-bottom: 30px;
 }
 .login__header img {
@@ -51,16 +70,16 @@ body.login-page {
 }
 
 .login__input {
+  width: 100%;
+  max-width: 300px;
+  padding: 15px;
+  margin-bottom: 15px;
   border: 2px solid #a3b18a;
-  background: #3a5a40;
   border-radius: 8px;
+  background: #3a5a40;
   color: #fff;
   font-size: 1.2em;
-  margin-bottom: 15px;
-  max-width: 300px;
   outline: none;
-  padding: 15px;
-  width: 100%;
   text-align: center;
 }
 .login__input::placeholder {
@@ -68,16 +87,15 @@ body.login-page {
 }
 
 .login__button {
-  background-color: #588157;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.2em;
-  font-family: 'Fredoka One', cursive;
+  width: 100%;
   max-width: 300px;
   padding: 15px;
-  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background-color: #588157;
+  color: #fff;
+  font-size: 1.2em;
+  cursor: pointer;
   transition: background-color 0.3s;
 }
 .login__button:hover:not(:disabled) {
@@ -89,10 +107,9 @@ body.login-page {
   cursor: auto;
 }
 
-
-/* --- ESTILOS DO JOGO --- */
-
-/* Temas de Fundo e Tamanho das Cartas para cada Fase */
+/* =========================================================
+   JOGO - TEMAS DE FUNDO POR FASE
+========================================================= */
 body.fase-1 {
   background: linear-gradient(45deg, #2b580c, #000000);
   --card-size: 140px;
@@ -103,32 +120,60 @@ body.fase-2 {
 }
 body.fase-3 {
   background: linear-gradient(45deg, #4b6a98, #1e2a3b);
-  --card-size: 120px;
+  --card-size: 100px;
 }
 body.fase-4 {
   background: linear-gradient(45deg, #8b0000, #2c1a1a);
-  --card-size: 90px; /* Cartas menores para caber na tela */
+  --card-size: 90px;
 }
 body.vitoria-final {
   background: linear-gradient(45deg, #ffd700, #ff8c00);
 }
 
+body.vitoria-final h2 {
+  color: #fff;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+}
+
+/* =========================================================
+   APP CONTAINER
+========================================================= */
 #app {
-  text-align: center;
+  max-width: 95vw;
   padding: 20px;
   border-radius: 20px;
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  max-width: 95vw;
+  text-align: center;
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-h2 {
-  margin-bottom: 25px;
+/* =========================================================
+   STATUS E CONTADOR
+========================================================= */
+.status {
+  margin-bottom: 15px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f1f1;
+  font-size: 1.1em;
+}
+
+.contador-jogadas {
+  margin-top: 20px;
+  font-size: 1.2em;
   color: #fff;
-  font-size: 2.5em;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
 
+body.fase-4 .contador-jogadas {
+  font-size: 1em;
+  margin-top: 10px;
+}
+
+/* =========================================================
+   TABULEIRO
+========================================================= */
 .tabuleiro {
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
@@ -138,22 +183,25 @@ h2 {
   perspective: 1000px;
 }
 
+/* =========================================================
+   CARTAS
+========================================================= */
 .carta {
   width: var(--card-size);
   height: var(--card-size);
-  cursor: pointer;
   position: relative;
-  background: none;
   border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .carta-inner {
   position: relative;
   width: 100%;
   height: 100%;
+  border-radius: 15px;
   transition: transform 0.6s;
   transform-style: preserve-3d;
-  border-radius: 15px;
 }
 
 .carta.revelada .carta-inner,
@@ -166,19 +214,19 @@ h2 {
   position: absolute;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden; /* Mantém essa propriedade */
   border-radius: 15px;
+  backface-visibility: hidden;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
 .carta-front {
   background: #3a5a40;
   border: 3px solid #a3b18a;
-  font-size: calc(var(--card-size) * 0.6);
   color: #a3b18a;
+  font-size: calc(var(--card-size) * 0.6);
 }
 
 .carta-back {
@@ -189,15 +237,29 @@ h2 {
 
 .carta.combinada {
   cursor: default;
-  opacity: 0.7;
-  transform: scale(0.95);
-  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0.9;
+  border: 3px solid gold;
 }
 
-/* Responsividade para telas pequenas */
+/* =========================================================
+   ESTADOS ESPECIAIS
+========================================================= */
+body.bloqueado .carta {
+  pointer-events: none;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+========================================================= */
 @media (max-width: 768px) {
   body.fase-3 { --card-size: 80px; }
   body.fase-4 { --card-size: 60px; }
   :root { --gap-size: 10px; }
   h2 { font-size: 2em; }
+}
+
+@media (max-width: 480px) {
+  body.fase-3 { --card-size: 65px; }
+  body.fase-4 { --card-size: 55px; }
+  h2 { font-size: 1.5em; }
 }
