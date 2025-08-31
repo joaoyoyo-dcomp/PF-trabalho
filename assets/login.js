@@ -32,8 +32,8 @@ const renderButton = attrs => {
 }
 
 // Descreve qual "efeito de login" deve acontecer
-const loginEffect = state => 
-  state ? { type: 'LOGIN', player: state.player } : { type: 'NOOP' }
+const loginEffect = state =>
+  state ? { type: 'LOGIN', player: state.player, modo: state.modo } : { type: 'NOOP' }
 
 // Para que o sistema funcione (salvar o nome do jogador e mudar de página), essas ações são obrigatórias. Em vez de misturar lógica com efeitos, usamos `loginEffect` (função pura) para apenas DESCREVER o que deve ser feito. Assim, `runEffect` é o único ponto realmente impuro, centralizando todos os efeitos e mantendo o resto do código dentro do paradigma funcional.
 const runEffect = effect => {
