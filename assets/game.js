@@ -48,16 +48,34 @@ const inicializarJogo = (dim, emojis, seed = Date.now() >>> 0) => {
 };
 
 // Cria o estado global inicial do jogo
-const criarEstadoInicial = () => ({
+const criarEstadoInicial = () => {
+    const modoSalvo = localStorage.getItem("modo");
+const modo = (modoSalvo === "dificil" || modoSalvo === "normal") ? modoSalvo : "normal";
+return {
   faseAtual: 0,
   atual: inicializarJogo(fasesConfig[0].dim, fasesConfig[0].emojis),
   historico: [],
   player: localStorage.getItem("player") || "Jogador",
   totalJogadas: 0,
-  totalAcertos: 0
-});
+  totalAcertos: 0,
+  modo,
+    tempo: modo === "dificil" ? 60 : null,
+  fim: false
+}};
 
 // ----------------- Regras do jogo -----------------
+
+//função que permite o timer
+const tick = (estado) => {
+  if (estado.modo !== "dificil" || estado.tempo === null) return estado;
+
+  const novoTempo = estado.tempo - 1;
+  return {
+    ...estado,
+    tempo: novoTempo,
+    fim: novoTempo <= 0 ? true : estado.fim // derrota se tempo chegar a zero
+  };
+};
 
 // Vira uma carta e retorna o novo estado
 const virarCarta = (estado, id) => {
@@ -115,6 +133,9 @@ const resetarCartas = estado => {
 const update = (estado, evento) => {
   const jogo = estado.atual;
 
+  if (evento.tipo === "tick") {
+  return tick(estado);
+}
   if (evento.tipo === "flip") {
     const novoJogo = virarCarta(jogo, evento.id);
 
@@ -131,7 +152,7 @@ const update = (estado, evento) => {
     if (novoJogo.vitoria) {
       const proxFase = estado.faseAtual + 1;
 
-      if (proxFase < fasesConfig.length) {
+   if (proxFase < fasesConfig.length) {
         // avança para próxima fase
         return {
           ...estado,
@@ -156,11 +177,15 @@ const update = (estado, evento) => {
 
     // caso normal (sem vitória ainda)
     return {
-      ...estado,
-      atual: novoJogo,
-      totalJogadas: jogadasGlobais,
-      totalAcertos: acertosGlobais
-    };
+  ...estado,
+  atual: novoJogo,
+  primeira: novoJogo.primeira,
+  bloqueado: novoJogo.bloqueado,
+  ultimaJogada: novoJogo.ultimaJogada,
+  totalJogadas: jogadasGlobais,
+  totalAcertos: acertosGlobais
+};
+
   }
 
   // --- Evento: timeout (resetar cartas erradas) ---
@@ -178,21 +203,25 @@ const update = (estado, evento) => {
 const view = (estado) => {
   const jogo = estado.atual;
 
-  if (jogo.fim) {
-  const player = localStorage.getItem('player') || "Jogador";
-  return `
-    <h2>🎉 Parabéns, ${player}! Você completou todas as fases! 🏆</h2>
-    <p>Total de jogadas: ${estado.totalJogadas}</p>
-    <p>Total de acertos: ${estado.totalAcertos}</p>
-  `;
-}
+  if (jogo.fim || estado.fim) {
+    return `
+      <h2>${estado.fim && estado.tempo <= 0 
+        ? "⏰ Tempo esgotado! Fim de jogo!" 
+        : `🎉 Parabéns, ${estado.player}!`}</h2>
+      <p>Total de jogadas: ${estado.totalJogadas}</p>
+      <p>Total de acertos: ${estado.totalAcertos}</p>
+      ${estado.modo === "dificil" ? `<p>Tempo restante: ${Math.max(estado.tempo,0)}s</p>` : ""}
+    `;
+  }
 
   return `
     <h2>Fase ${estado.faseAtual + 1}</h2>
-  <div class="status">
-    <p>Jogadas da fase: ${jogo.jogadas}</p>
-    <p>Jogadas totais: ${estado.totalJogadas}</p>
-    <p>Acertos totais: ${estado.totalAcertos}</p> </div>
+    ${estado.modo === "dificil" ? `<p class="contador-tempo">⏱ ${estado.tempo}s</p>` : ""}
+    <div class="status">
+      <p>Jogadas da fase: ${jogo.jogadas}</p>
+      <p>Jogadas totais: ${estado.totalJogadas}</p>
+      <p>Acertos totais: ${estado.totalAcertos}</p>
+    </div>
     <div class="tabuleiro">
       ${jogo.cartas.map(c => `
         <div class="carta ${c.revelada ? "revelada" : ""} ${c.combinada ? "combinada" : ""}" data-id="${c.id}">
@@ -208,7 +237,28 @@ const view = (estado) => {
 
 // ----------------- Funções impuras -----------------
 
-// Aplica estilos no DOM -> IMPURA (manipula o ambiente externo, não só entrada/saída)
+//função que aplica o timer
+// ----------------- Funções impuras -----------------
+
+// Inicia o jogo e dispara o loop principal
+const start = (estadoInicial) => {
+  // desenha e ativa cliques
+  loop(estadoInicial);
+
+  const loopTimer = (estado) => {
+    if (estado.modo !== "dificil" || estado.fim || (estado.atual && estado.atual.fim)) return;
+
+    const novo = update(estado, { tipo: "tick" });
+    loop(novo);
+
+    // chama novamente passando o estado atualizado
+    setTimeout(() => loopTimer(novo), 1000);
+  };
+
+  loopTimer(estadoInicial);
+};
+
+// Aplica estilos no DOM
 const aplicarEstiloFase = (estado) => {
   const [rows, cols] = estado.atual.dim;
   document.body.className = `fase-${estado.faseAtual + 1}`;
@@ -217,8 +267,7 @@ const aplicarEstiloFase = (estado) => {
   document.documentElement.style.setProperty("--gap-size", "15px");
 };
 
-
-// Loop principal do jogo -> IMPURA (renderiza no DOM e captura eventos do usuário)
+// Loop principal do jogo
 const loop = (estado) => {
   const app = document.getElementById("app");
   app.innerHTML = view(estado);
@@ -226,34 +275,35 @@ const loop = (estado) => {
 
   const jogo = estado.atual;
 
-  if (jogo.bloqueado) {
-    document.body.classList.add("bloqueado");
-  } else {
-    document.body.classList.remove("bloqueado");
-  }
+  if (jogo.bloqueado) document.body.classList.add("bloqueado");
+  else document.body.classList.remove("bloqueado");
 
   if (jogo.fim) {
     document.body.className = "vitoria-final";
     return;
   }
-  // evento de clique -> interação com usuário é sempre impura
+
+  // clique nas cartas → gera novo estado e continua a recursão
   app.onclick = (e) => {
     const cartaEl = e.target.closest(".carta");
     if (!cartaEl) return;
 
     const id = parseInt(cartaEl.dataset.id, 10);
-    const novo = update(estado, { tipo: "flip", id });
-    loop(novo);
 
-    if (novo.atual.bloqueado && novo.atual.ultimaJogada) {
+    const novoEstado = update(estado, { tipo: "flip", id });
+    loop(novoEstado);
+
+    if (novoEstado.atual.bloqueado && novoEstado.atual.ultimaJogada?.length === 2) {
       setTimeout(() => {
-        loop(update(novo, { tipo: "timeout" }));
+        const resetado = update(novoEstado, { tipo: "timeout" });
+        loop(resetado);
       }, 800);
     }
   };
 };
 
 
-
 // ----------------- Início -----------------
-  loop(criarEstadoInicial());
+window.onload = () => {
+  start(criarEstadoInicial());
+};
