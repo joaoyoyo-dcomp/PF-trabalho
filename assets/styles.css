@@ -165,6 +165,13 @@ body.vitoria-final h2 {
   color: #fff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
+.contador-tempo {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  margin-bottom: 10px;
+}
 
 body.fase-4 .contador-jogadas {
   font-size: 1em;
