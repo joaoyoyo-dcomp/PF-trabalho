@@ -1,44 +1,57 @@
 /* =========================================================
-   VARIÁVEIS GLOBAIS
+   TOKENS
 ========================================================= */
-:root {
-  --gap-size: 15px; /* espaçamento entre cartas */
+:root{
+  --gap-size: clamp(6px, 0.9vw, 10px);
+  --card-radius: 16px;
+
+  --accent: #ffd700;
+  --front-bg: #3a5a40;
+  --front-border: #a3b18a;
+  --back-bg: #dad7cd;
+  --text-soft: #f1f1f1;
+
+  --glass: rgba(0,0,0,.35);
+  --shadow-1: 0 10px 30px rgba(0,0,0,.45);
+  --shadow-2: 0 4px 15px rgba(0,0,0,.4);
 }
 
 /* =========================================================
    BASE
 ========================================================= */
-body {
-  font-family: 'Nunito', 'Fredoka One', cursive, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  height: 100vh;
-  margin: 0;
-  transition: background 0.5s ease;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
+body{
+  font-family: 'Nunito','Fredoka One',cursive,sans-serif;
+  display:flex; justify-content:center; align-items:center; flex-direction:column;
+  height:100vh; margin:0; overflow:hidden; position:relative;
+  background-size:cover; background-position:center;
+  transition: background .5s ease;
 }
-
-h2 {
-  margin-bottom: 25px;
-  font-size: 2.5em;
-  color: #fff;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-  font-family: 'Fredoka One', cursive;
-}
-
-h2, .login__button {
-  font-family: 'Fredoka One', cursive;
+h2{
+  margin-bottom:20px; font-size:clamp(1.6rem, 2.8vw, 2.5rem);
+  color:#fff; text-shadow:2px 2px 5px rgba(0,0,0,.7);
+  font-family:'Fredoka One',cursive;
 }
 
 /* =========================================================
-   TELA DE LOGIN
+   LOGIN
+========================================================= */
+/* =========================================================
+   LOGIN PAGE TEMÁTICA
 ========================================================= */
 body.login-page {
-  background: linear-gradient(45deg, #2b580c, #000000);
+  background: radial-gradient(circle at top, #0b3d0b 0%, #000 100%);
+  overflow: hidden;
+}
+body.login-page::before {
+  content: "🦖 🌴 🐢 🐊 🐍 🦎";
+  font-size: 5rem;
+  opacity: 0.05;
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .login-form {
@@ -46,227 +59,286 @@ body.login-page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, rgba(80, 50, 20, 0.92), rgba(20, 15, 10, 0.85));
+  padding: 50px 40px;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  border: 3px solid rgba(255,215,0,.25);
+  animation: popIn 1s ease forwards;
+  transform: scale(.9);
+  opacity: 0;
+}
+@keyframes popIn {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-.login__header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
+
 .login__header img {
-  width: 100px;
-  margin-bottom: 20px;
-  border-radius: 50%;
+  width: 180px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.6);
 }
 .login__header h1 {
-  color: #fff;
-  font-size: 2em;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+  font-size: 2rem;
+  color: #ffd700;
+  text-shadow: 2px 2px 6px rgba(0,0,0,.8);
 }
 
+/* Inputs: pedra */
 .login__input {
   width: 100%;
-  max-width: 300px;
-  padding: 15px;
-  margin-bottom: 15px;
-  border: 2px solid #a3b18a;
-  border-radius: 8px;
-  background: #3a5a40;
-  color: #fff;
-  font-size: 1.2em;
-  outline: none;
+  max-width: 320px;
+  padding: 14px;
+  margin-bottom: 14px;
   text-align: center;
+  border: 2px solid #7aa86e;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #3a5a40, #2b442f);
+  color: #fff;
+  font-size: 1.1rem;
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.4);
 }
-.login__input::placeholder {
-  color: #a3b18a;
+.login__input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 6px #ffd700;
+}
+.login__input::placeholder { color: #a3b18a; }
+
+/* Modos: tribais */
+.login__modes {
+  display: flex;
+  gap: 14px;
+  margin: 16px 0;
+}
+.login__mode {
+  flex: 1;
+  text-align: center;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.08);
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: bold;
+  color: #eee;
+  transition: .25s;
+}
+.login__mode:hover { border-color: #ffd700; transform: translateY(-2px); }
+.login__mode.selected {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #000;
+  box-shadow: 0 0 12px rgba(255,140,0,.4);
 }
 
+/* Botão: tocha */
 .login__button {
   width: 100%;
-  max-width: 300px;
-  padding: 15px;
+  max-width: 320px;
+  padding: 14px;
   border: none;
-  border-radius: 8px;
-  background-color: #588157;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8c00, #cc6600);
   color: #fff;
-  font-size: 1.2em;
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: transform .2s, box-shadow .3s;
+  box-shadow: 0 6px 18px rgba(0,0,0,.5);
 }
 .login__button:hover:not(:disabled) {
-  background-color: #3a5a40;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
 }
 .login__button:disabled {
-  background-color: #333;
+  background: #333;
   color: #777;
   cursor: auto;
 }
 
 /* =========================================================
-   JOGO - TEMAS DE FUNDO POR FASE
+   TEMAS JURÁSSICOS POR FASE
 ========================================================= */
-body.fase-1 {
-  background: linear-gradient(45deg, #2b580c, #000000);
-  --card-size: 140px;
+body.fase-1{
+  --accent:#9acd32; --front-bg:#2e4d2e; --front-border:#7aa86e; --back-bg:#dad7cd;
+  background: radial-gradient(circle at top left, #0b3d0b, #000);
+  --card-size:140px; --gap-size: 8px;
 }
-body.fase-2 {
-  background: linear-gradient(45deg, #c2b280, #8a795d);
-  --card-size: 130px;
+body.fase-1 .tabuleiro{ max-width:320px; margin:0 auto; }
+
+body.fase-2{
+  --accent:#e6b566; --front-bg:#7b5e3c; --front-border:#d9c197; --back-bg:#f7ebd4;
+  background: linear-gradient(45deg,#e0c188,#9c7f5c);
+  --card-size:130px;
 }
-body.fase-3 {
-  background: linear-gradient(45deg, #4b6a98, #1e2a3b);
-  --card-size: 100px;
+body.fase-3{
+  --accent:#66d9ff; --front-bg:#1b3d5c; --front-border:#5ca9d6; --back-bg:#e0f7ff;
+  background: radial-gradient(circle at bottom, #1e3a5f, #0a1a2a);
+  background-size:600% 600%;
+  animation: waveBG 25s ease alternate;
+  --card-size:100px;
 }
-body.fase-4 {
-  background: linear-gradient(45deg, #8b0000, #2c1a1a);
-  --card-size: 90px;
+@keyframes waveBG{
+  0%{background-position:0% 50%}
+  100%{background-position:100% 50%}
 }
+body.fase-4{
+  --accent:#ff6347; --front-bg:#3d1b1b; --front-border:#ff8c69; --back-bg:#ffe5d5;
+  background: radial-gradient(circle, #8b0000, #1a0000);
+  --card-size:90px;
+}
+/* =======================
+   VITÓRIA FINAL
+======================= */
 body.vitoria-final {
-  background: linear-gradient(45deg, #ffd700, #ff8c00);
+  background: radial-gradient(circle at center, #ffd700 0%, #ff8c00 70%, #5a2c00 100%);
+  position: relative;
+  overflow: hidden;
 }
 
+/* raios de luz */
+body.vitoria-final::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg, rgba(255,255,255,.15) 0deg 20deg, transparent 20deg 40deg);
+  background-size: 100% 100%;
+  animation: spinRays 20s linear infinite;
+  pointer-events: none;
+}
+@keyframes spinRays {
+  to { transform: rotate(360deg); }
+}
+
+/* partículas douradas */
+body.vitoria-final::after {
+  content: "✨✨✨✨✨";
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: floatParticles 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes floatParticles {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(-40px); opacity: 0.1; }
+}
+
+/* título da vitória */
 body.vitoria-final h2 {
-  color: #fff;
-  text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+  font-size: 3rem;
+  color: #fff8dc;
+  text-shadow: 3px 3px 6px rgba(0,0,0,.9), 0 0 20px #ffd700;
+  animation: popVictory 1.2s ease forwards;
+}
+@keyframes popVictory {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
-/* =========================================================
-   APP CONTAINER
-========================================================= */
-#app {
-  max-width: 95vw;
-  padding: 20px;
-  border-radius: 20px;
-  text-align: center;
-  background: rgba(0,0,0,0.4);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-/* =========================================================
-   STATUS E CONTADOR
-========================================================= */
-.status {
-  margin-bottom: 15px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #f1f1f1;
-  font-size: 1.1em;
-}
-
-.contador-jogadas {
-  margin-top: 20px;
-  font-size: 1.2em;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-}
-.contador-tempo {
-  font-size: 1.4em;
+/* botão da tela final */
+.vitoria-final .login__button {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #000;
   font-weight: bold;
-  color: #ffd700;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-  margin-bottom: 10px;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,.6);
+}
+.vitoria-final .login__button:hover {
+  background: linear-gradient(135deg, #fff176, #ffa000);
+  transform: translateY(-2px);
 }
 
-body.fase-4 .contador-jogadas {
-  font-size: 1em;
-  margin-top: 10px;
+/* =========================================================
+   APP CONTAINER (vidro)
+========================================================= */
+#app{
+  max-width:95vw; padding:18px; border-radius:20px; text-align:center;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-1);
+  border:1px solid rgba(255,255,255,.12);
 }
+
+/* =========================================================
+   HUD / STATUS (madeira)
+========================================================= */
+.status{
+  margin-bottom:12px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+.status p{
+  padding:8px 12px; border-radius:6px;
+  background: linear-gradient(135deg, #5c4033, #3b2c26);
+  border:2px solid #2a1d18; color:#f5deb3; font-weight:bold;
+  box-shadow: inset 0 0 5px rgba(0,0,0,.6);
+  font-family:'Fredoka One',cursive;
+}
+.contador-tempo{ font-size:1.25rem; font-weight:700; color: var(--accent); margin-bottom:10px; }
 
 /* =========================================================
    TABULEIRO
 ========================================================= */
-.tabuleiro {
-  display: grid;
+.tabuleiro{
+  display:grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
   gap: var(--gap-size);
-  margin: 0 auto;
-  perspective: 1000px;
+  margin:0 auto;
+  perspective:1000px;
 }
 
 /* =========================================================
-   CARTAS
+   CARTAS (selvagem)
 ========================================================= */
-.carta {
-  width: var(--card-size);
-  height: var(--card-size);
-  position: relative;
-  border: none;
-  background: none;
-  cursor: pointer;
+.carta{ width:var(--card-size); height:var(--card-size); position:relative; border:none; background:none; cursor:pointer; }
+.carta-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; border-radius:var(--card-radius); transition: transform .55s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.carta.revelada .carta-inner,.carta.combinada .carta-inner{ transform: rotateY(180deg); box-shadow: 0 0 18px rgba(255,255,255,.5); }
+
+.carta-front,.carta-back{ position:absolute; inset:0; border-radius:var(--card-radius); backface-visibility:hidden; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-2); }
+
+/* Frente: textura de pedra/escamas */
+.carta-front{
+  background: repeating-linear-gradient(45deg, var(--front-bg), var(--front-bg) 6px, rgba(0,0,0,.25) 7px, var(--front-bg) 12px);
+  border:3px solid var(--front-border); color: var(--front-border);
+  font-size: calc(var(--card-size) * .6);
 }
 
-.carta-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 15px;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-}
-
-.carta.revelada .carta-inner,
-.carta.combinada .carta-inner {
+/* Verso: tom de fóssil */
+.carta-back{
+  background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(255,255,255,0)), var(--back-bg);
   transform: rotateY(180deg);
+  font-size: calc(var(--card-size) * .5);
 }
 
-.carta-front,
-.carta-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 15px;
-  backface-visibility: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+/* Hover */
+@media (hover:hover){
+  .carta:not(.revelada):hover .carta-inner{ transform: translateY(-2px); }
 }
 
-.carta-front {
-  background: #3a5a40;
-  border: 3px solid #a3b18a;
-  color: #a3b18a;
-  font-size: calc(var(--card-size) * 0.6);
-}
+/* Acertou o par: pulso uma vez */
+.carta.combinada .carta-inner{ animation: pulse .55s ease forwards; animation-iteration-count: 1; }
+@keyframes pulse{ 0%,100%{ transform: scale(1) rotateY(180deg); } 50%{ transform: scale(1.06) rotateY(180deg); } }
+.carta.combinada{ cursor:default; opacity:.95; outline:3px solid var(--accent); }
 
-.carta-back {
-  background: #dad7cd;
-  transform: rotateY(180deg);
-  font-size: calc(var(--card-size) * 0.5);
-}
-
-.carta.combinada {
-  cursor: default;
-  opacity: 0.9;
-  border: 3px solid gold;
-}
-
-/* =========================================================
-   ESTADOS ESPECIAIS
-========================================================= */
-body.bloqueado .carta {
-  pointer-events: none;
-}
+/* Bloqueio */
+body.bloqueado .carta{ pointer-events:none; }
 
 /* =========================================================
    RESPONSIVIDADE
 ========================================================= */
-@media (max-width: 768px) {
-  body.fase-3 { --card-size: 80px; }
-  body.fase-4 { --card-size: 60px; }
-  :root { --gap-size: 10px; }
-  h2 { font-size: 2em; }
+@media (max-width: 768px){
+  body.fase-3{ --card-size:80px; }
+  body.fase-4{ --card-size:60px; }
+  :root{ --gap-size: 8px; }
 }
-
-@media (max-width: 480px) {
-  body.fase-3 { --card-size: 65px; }
-  body.fase-4 { --card-size: 55px; }
-  h2 { font-size: 1.5em; }
+@media (max-width: 480px){
+  body.fase-3{ --card-size:65px; }
+  body.fase-4{ --card-size:55px; }
+  :root{ --gap-size: 6px; }
 }
