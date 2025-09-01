@@ -1,6 +1,6 @@
 // ----------------- Funções utilitárias -----------------
 
-// Gera um número pseudoaleatório e determinístico a partir de uma seed.
+// Gera um número pseudoaleatório e determinístico a partir de uma seed
 const nextRandom = seed => {
   const next = (1664525 * seed + 1013904223) >>> 0;
   return { value: next / 2 ** 32, seed: next };
@@ -235,75 +235,104 @@ const view = (estado) => {
   `;
 };
 
-// ----------------- Funções impuras -----------------
 
 //função que aplica o timer
 // ----------------- Funções impuras -----------------
 
-// Inicia o jogo e dispara o loop principal
-const start = (estadoInicial) => {
-  // desenha e ativa cliques
-  loop(estadoInicial);
+// Isso é crucial para que os timers e os cliques sempre usem a versão mais recente do estado
+let estadoAtual;
 
-  const loopTimer = (estado) => {
-    if (estado.modo !== "dificil" || estado.fim || (estado.atual && estado.atual.fim)) return;
+// Função central para despachar eventos, atualizar o estado e redesenhar a tela
+const dispatch = (evento) => {
+  // 1. Calcula o novo estado usando a função pura 'update'
+  const novoEstado = update(estadoAtual, evento);
 
-    const novo = update(estado, { tipo: "tick" });
-    loop(novo);
+  // 2. Atualiza a referência mutável para o novo estado
+  estadoAtual = novoEstado;
 
-    // chama novamente passando o estado atualizado
-    setTimeout(() => loopTimer(novo), 1000);
-  };
+  // 3. Renderiza a nova interface com base no novo estado
+  loop(estadoAtual);
 
-  loopTimer(estadoInicial);
+  // 4. Se o último movimento foi um par incorreto, agenda o desvirar das cartas
+  if (estadoAtual.atual.ultimaJogada) {
+    setTimeout(() => {
+      // Dispara um novo evento para resetar as cartas
+      dispatch({ tipo: 'timeout' });
+    }, 800); // 800ms para o jogador ver as cartas antes de virarem
+  }
 };
 
-// Aplica estilos no DOM
-const aplicarEstiloFase = (estado) => {
-  const [rows, cols] = estado.atual.dim;
-  document.body.className = `fase-${estado.faseAtual + 1}`;
-  document.documentElement.style.setProperty("--rows", rows);
-  document.documentElement.style.setProperty("--cols", cols);
-  document.documentElement.style.setProperty("--gap-size", "15px");
-};
-
-// Loop principal do jogo
+// Loop principal de renderização. Apenas lê o estado e atualiza o DOM
 const loop = (estado) => {
-  const app = document.getElementById("app");
+  const app = document.getElementById('app');
+  if (!app) return;
+
   app.innerHTML = view(estado);
   aplicarEstiloFase(estado);
 
   const jogo = estado.atual;
 
-  if (jogo.bloqueado) document.body.classList.add("bloqueado");
-  else document.body.classList.remove("bloqueado");
-
-  if (jogo.fim) {
-    document.body.className = "vitoria-final";
-    return;
+  if (jogo.bloqueado) {
+    document.body.classList.add('bloqueado');
+  } else {
+    document.body.classList.remove('bloqueado');
   }
 
-  // clique nas cartas → gera novo estado e continua a recursão
-  app.onclick = (e) => {
-    const cartaEl = e.target.closest(".carta");
-    if (!cartaEl) return;
-
-    const id = parseInt(cartaEl.dataset.id, 10);
-
-    const novoEstado = update(estado, { tipo: "flip", id });
-    loop(novoEstado);
-
-    if (novoEstado.atual.bloqueado && novoEstado.atual.ultimaJogada?.length === 2) {
-      setTimeout(() => {
-        const resetado = update(novoEstado, { tipo: "timeout" });
-        loop(resetado);
-      }, 800);
-    }
-  };
+  // Se o jogo terminou (por vitória ou tempo), aplica a classe final
+  if (jogo.fim || estado.fim) {
+    document.body.className = 'vitoria-final';
+  }
 };
 
+// Aplica estilos no DOM com base na fase atual
+const aplicarEstiloFase = (estado) => {
+  const [rows, cols] = estado.atual.dim;
+
+  // Previne erro caso o jogo já tenha terminado
+  if (!estado.fim && !estado.atual.fim) {
+      document.body.className = `fase-${estado.faseAtual + 1}`;
+  }
+  document.documentElement.style.setProperty('--rows', rows);
+  document.documentElement.style.setProperty('--cols', cols);
+};
+
+// Função de inicialização do jogo
+const start = (estadoInicial) => {
+  estadoAtual = estadoInicial;
+
+  // Se o modo for 'dificil', iniciamos um intervalo de 1 segundo
+  if (estadoAtual.modo === 'dificil') {
+    const timerInterval = setInterval(() => {
+      // Se o jogo acabou (por vitória ou derrota), paramos o timer
+      if (estadoAtual.fim || estadoAtual.atual.fim) {
+        clearInterval(timerInterval);
+        return;
+      }
+      // A cada segundo, despacha o evento 'tick'
+      dispatch({ tipo: 'tick' });
+    }, 1000); // 1000ms = 1 segundo
+  }
+
+  // Adiciona um listener de cliques ao container do app (delegação de eventos)
+  const appElement = document.getElementById('app');
+  appElement.addEventListener('click', (e) => {
+    // Encontra o elemento de carta mais próximo do clique
+    const carta = e.target.closest('.carta');
+
+    if (carta && !estadoAtual.atual.bloqueado && !estadoAtual.fim) {
+      const id = parseInt(carta.dataset.id, 10);
+      if (!isNaN(id)) {
+        dispatch({ tipo: 'flip', id });
+      }
+    }
+  });
+
+  // Renderiza o estado inicial pela primeira vez
+  loop(estadoAtual);
+};
 
 // ----------------- Início -----------------
 window.onload = () => {
+  // Inicia o jogo com o estado inicial criado
   start(criarEstadoInicial());
 };
