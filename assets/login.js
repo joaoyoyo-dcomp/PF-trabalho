@@ -3,18 +3,19 @@ const select = root => ({
   input:  () => root.querySelector('.login__input'),
   button: () => root.querySelector('.login__button'),
   form:   () => root.querySelector('.login-form'),
-  // Novo seletor para os modos de jogo
   modo:   () => root.querySelector('input[name="modo"]:checked'),
+  modos:  () => root.querySelectorAll('input[name="modo"]'),
+  modeLabels: () => root.querySelectorAll('.login__mode')
 });
 
-// Valida um valor de entrada (pelo menos 3 caracteres)
-const isValid = value => value.length > 0;
+// Valida um valor de entrada (mínimo 3 caracteres)
+const isValid = value => value.trim().length >= 3;
 
 // Descreve o estado do login com base nos valores do formulário
 const getLoginState = (formElement) => {
   const dom = select(formElement);
   const playerName = dom.input().value;
-  const gameMode = dom.modo().value; // Captura o valor do modo (ex: "dificil")
+  const gameMode = dom.modo().value;
 
   if (isValid(playerName)) {
     return { player: playerName, modo: gameMode };
@@ -46,12 +47,35 @@ const runEffect = (effect) => {
   if (effect.type === 'LOGIN') {
     localStorage.setItem('player', effect.player);
     localStorage.setItem('modo', effect.modo); 
-    window.location.href = 'pagina/page1.html'; // Usar href para maior compatibilidade
+    window.location.href = 'pagina/page1.html';
   }
 };
 
-// --- Manipuladores de Eventos ---
+// --- Funções para seleção de modo ---
+const getSelectedMode = (radios) =>
+  [...radios].find(r => r.checked)?.value || null;
 
+const renderSelectedMode = (radios, labels) => {
+  const selected = getSelectedMode(radios);
+  labels.forEach(label => {
+    const value = label.querySelector('input').value;
+    label.classList.toggle('selected', value === selected);
+  });
+};
+
+const initModeSelection = (root = document) => {
+  const dom = select(root);
+  const radios = dom.modos();
+  const labels = dom.modeLabels();
+
+  radios.forEach(r =>
+    r.addEventListener('change', () => renderSelectedMode(radios, labels))
+  );
+
+  renderSelectedMode(radios, labels);
+};
+
+// --- Manipuladores de Eventos ---
 const handleInput = (event) => {
   const valid = isValid(event.target.value);
   const attrs = getButtonAttrs(valid);
@@ -69,3 +93,4 @@ const handleSubmit = (event) => {
 const dom = select(document);
 dom.input().addEventListener('input', handleInput);
 dom.form().addEventListener('submit', handleSubmit);
+initModeSelection(document);
