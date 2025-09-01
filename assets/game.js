@@ -59,7 +59,7 @@ return {
   totalJogadas: 0,
   totalAcertos: 0,
   modo,
-    tempo: modo === "dificil" ? 60 : null,
+    tempo: modo === "dificil" ? 180 : null,
   fim: false
 }};
 
