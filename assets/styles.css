@@ -116,15 +116,23 @@ body.login-page::before {
 }
 .login__mode {
   flex: 1;
+  display: flex;             
+  align-items: center;       
+  justify-content: center;    
+  gap: 8px;                   
   text-align: center;
-  padding: 14px 20px;
-  border-radius: 10px;
+  padding: 14px 22px;
+  border-radius: 12px;
   background: rgba(255,255,255,.08);
   border: 2px solid transparent;
-  cursor: pointer;
-  font-weight: bold;
-  color: #eee;
   transition: .25s;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: var(--shadow-2);
+}
+.login__mode input[type="radio"] {
+  margin: 0;          
+  transform: scale(1.2); 
 }
 .login__mode:hover { border-color: #ffd700; transform: translateY(-2px); }
 .login__mode.selected {
