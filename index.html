@@ -12,20 +12,19 @@
   <body class="login-page">
     <form class="login-form">
       <div class="login__header">
-        <img src="./images/dcomp.jpg" alt="dcomp icon">
-        <h1>Jogo da Memória</h1>
+        <img src="./images/logo.png" alt="icon do jogo">
       </div>
       <input type="text" placeholder="Digite seu nome" class="login__input">
       <div class="login__modes">
-        <label>
-          <input type="radio" name="modo" value="normal" checked>
-          Normal
-        </label>
-        <label>
-          <input type="radio" name="modo" value="dificil">
-          Difícil
-        </label>
-      </div>
+  <label class="login__mode">
+    <input type="radio" name="modo" value="normal" checked>
+    <span>Normal</span>
+  </label>
+  <label class="login__mode">
+    <input type="radio" name="modo" value="dificil">
+    <span>Difícil</span>
+  </label>
+</div>
       <button type="submit" class="login__button" disabled>Jogar</button>
     </form>
   </body>
